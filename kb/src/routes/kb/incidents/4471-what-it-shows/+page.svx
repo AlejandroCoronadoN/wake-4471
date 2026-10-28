@@ -39,9 +39,10 @@ How the rows are made, in words:
 2. Every report is placed by its **tenant** (locale and booking form), never by what intake
    guessed from the browser (`causeOf` in `causes.ts`). Intake disagreed with the tenant on 38
    reports: 23 tagged `hint` are `parser`, 15 tagged `parser` are `hint`.
-3. The five reports the desk itself read as a one-day move (`desk-notes.json`) leave the `parser`
-   row and get their own. `causes.ts` kept them under `parser` as a footnote; a report belongs to
-   one problem, so here it is a row. That is why `parser` reads 374 here and 379 in the table below.
+3. The five reports the desk itself read as a one-day move (`desk-notes.json`) are counted where
+   the desk files them, under `parser`, as the export does (`readAs` in `causes.ts`). Here they also
+   get a row and a ticket of their own, so the desk can stop footnoting them. The counts are the
+   desk's own view, as exported: 379 parser, 33 hint, 5 read as a one-day move.
 
 ## The three problems
 

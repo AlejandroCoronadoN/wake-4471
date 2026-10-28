@@ -30,18 +30,20 @@ const issueLabel = (u) => (u && !u.startsWith('__') ? `<a href="${u}">#${u.split
 
 const splitTable = () => {
   const rows = Object.entries(split.problems).map(([p, g]) => `<tr><td><code>${p}</code></td><td>${g.reports}</td><td class="tags">${list(g.intakeTaggedAs)}</td><td class="tags">${list(g.channels)}</td><td>${Object.keys(g.tenants).length}</td><td>${g.firstSeen} → ${g.lastSeen}</td><td>${issueLabel(filed[p])}</td></tr>`).join('\n');
-  const total = Object.values(split.problems).reduce((n, g) => n + g.reports, 0);
+  const total = Object.values(split.problems).filter((g) => !g.countedIn).reduce((n, g) => n + g.reports, 0);
+  const foot = Object.entries(split.problems).filter(([, g]) => g.countedIn).map(([p, g]) => `<p class="note">${g.reports} reports read as a <code>${p}</code>: the desk counts them in <code>${g.countedIn}</code>, as exported; they have a ticket of their own.</p>`).join("\n");
   return `<p class="sum"><strong>${total}</strong> reports merged into #4471 · <strong>${Object.keys(split.problems).length}</strong> problems</p>
 <table><thead><tr><th>problem</th><th>reports</th><th>tagged at intake as</th><th>via</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead><tbody>
 ${rows}
-</tbody></table>`;
+</tbody></table>
+${foot}`;
 };
 const causeTable = () => {
   const k = split.kbRuleAlone;
   const p = split.problems.parser, h = split.problems.hint, o = split.problems['one-day-move'];
   return `<p class="sum"><strong>${k.parser + k.hint}</strong> reports merged into #4471 · <strong>2</strong> causes</p>
 <table><thead><tr><th>cause</th><th>reports</th><th>tagged as</th><th>tenants</th><th>seen</th><th></th></tr></thead><tbody>
-<tr><td><code>parser</code></td><td>${k.parser}</td><td class="tags">parser ×${p.intakeTaggedAs.parser + (o?.intakeTaggedAs.parser ?? 0)} · hint ×${p.intakeTaggedAs.hint}</td><td>${Object.keys(p.tenants).length}</td><td>${p.firstSeen} → ${p.lastSeen}</td><td>#4471</td></tr>
+<tr><td><code>parser</code></td><td>${k.parser}</td><td class="tags">${list(p.intakeTaggedAs)}</td><td>${Object.keys(p.tenants).length}</td><td>${p.firstSeen} → ${p.lastSeen}</td><td>#4471</td></tr>
 <tr class="wrong"><td><code>hint</code></td><td>${k.hint}</td><td class="tags">${list(h.intakeTaggedAs)}</td><td>${Object.keys(h.tenants).length}</td><td>${h.firstSeen} → ${h.lastSeen}</td><td>not this ticket — no ticket of its own</td></tr>
 </tbody></table>
 <p class="note">${o?.reports ?? 0} reports read as a one-day move; filed under <code>parser</code> by tenant.</p>`;

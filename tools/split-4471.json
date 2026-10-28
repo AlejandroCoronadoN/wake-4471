@@ -11,39 +11,41 @@
   },
   "problems": {
     "parser": {
-      "reports": 374,
+      "reports": 379,
       "firstSeen": "2026-04-01",
       "lastSeen": "2026-10-04",
       "tenants": {
         "harbour.dental": 52,
-        "lantern.row": 27,
-        "kettle.books": 46,
+        "kettle.books": 47,
+        "lantern.row": 28,
         "morrow.tax": 40,
         "long.table": 39,
         "ridge.clinic": 36,
-        "pale.harbour": 20,
+        "alder.physio": 23,
+        "pale.harbour": 21,
         "copper.studio": 19,
-        "nine.lanterns": 43,
-        "alder.physio": 22,
+        "nine.lanterns": 44,
         "stone.and.sons": 30
       },
       "channels": {
-        "app": 202,
-        "email": 147,
+        "app": 204,
+        "email": 150,
         "form": 25
       },
       "intakeTaggedAs": {
-        "parser": 351,
+        "parser": 356,
         "hint": 23
       },
       "ids": [
         "R-41200",
         "R-41201",
+        "R-41202",
         "R-41203",
         "R-41204",
         "R-41205",
         "R-41206",
         "R-41208",
+        "R-41209",
         "R-41210",
         "R-41211",
         "R-41212",
@@ -68,6 +70,7 @@
         "R-41233",
         "R-41234",
         "R-41235",
+        "R-41236",
         "R-41237",
         "R-41238",
         "R-41239",
@@ -165,6 +168,7 @@
         "R-41341",
         "R-41342",
         "R-41343",
+        "R-41344",
         "R-41345",
         "R-41346",
         "R-41347",
@@ -410,7 +414,8 @@
         "R-41616",
         "R-41617",
         "R-41618",
-        "R-41619"
+        "R-41619",
+        "R-41620"
       ]
     },
     "hint": {
@@ -489,7 +494,8 @@
         "R-41236",
         "R-41344",
         "R-41620"
-      ]
+      ],
+      "countedIn": "parser"
     }
   },
   "intakeDisagreements": {
