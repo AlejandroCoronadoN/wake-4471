@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Splits support ticket #4471 into the problems it really holds.
 // Runs the kb's own rule (support-kb/src/lib/kb/causes.ts, ported 1:1) over the export,
-// then takes out the reports the desk itself read as a one-day move (desk-notes.json).
+// and keeps the desk's own view of the five one-day moves (desk-notes.json): counted in parser, footnoted, here also a row.
 //
 // usage: node tools/split-4471.mjs <path-to-unzipped>/support-kb > tools/split-4471.json
 // Read-only. Needs Node 20+. No dependencies.
@@ -36,11 +36,11 @@ const unique = uniqueById(reports);
 const merged = unique.filter((r) => r.mergedInto === 4471);
 const oneDay = new Set(notes.oneDayMove);
 
-const problems = { parser: [], hint: [], 'one-day-move': [], unplaced: [] };
-for (const r of merged) {
-  if (oneDay.has(r.id)) { problems['one-day-move'].push(r); continue; }
-  problems[causeOf(r, byHandle.get(r.tenant)) ?? 'unplaced'].push(r);
-}
+const problems = { parser: [], hint: [], unplaced: [] };
+for (const r of merged) problems[causeOf(r, byHandle.get(r.tenant)) ?? 'unplaced'].push(r);
+// The desk's view, as exported: the one-day moves stay counted where they are filed (parser) and
+// are footnoted (causes.ts readAs). They get a row and a ticket of their own, counted the desk's way.
+problems['one-day-move'] = merged.filter((r) => oneDay.has(r.id));
 
 const count = (rs, f) => rs.reduce((n, r) => ((n[f(r)] = (n[f(r)] ?? 0) + 1), n), {});
 const summary = (rs) => {
@@ -64,6 +64,7 @@ const out = {
   intakeDisagreements: count(merged.filter((r) => { const c = causeOf(r, byHandle.get(r.tenant)); return c && c !== r.meta.intakeTag; }), (r) => `${r.meta.intakeTag}→${causeOf(r, byHandle.get(r.tenant))}`),
   duplicateIds: [...new Set(reports.map((r) => r.id).filter((id, i, a) => a.indexOf(id) !== i))],
 };
-const total = Object.values(out.problems).reduce((n, p) => n + p.reports, 0);
-if (total !== merged.length) throw new Error(`partition lost reports: ${total} != ${merged.length}`);
+const placed = (out.problems.parser?.reports ?? 0) + (out.problems.hint?.reports ?? 0) + (out.problems.unplaced?.reports ?? 0);
+if (placed !== merged.length) throw new Error(`cause rows lost reports: ${placed} != ${merged.length}`);
+out.problems['one-day-move'].countedIn = 'parser';
 console.log(JSON.stringify(out, null, 2));

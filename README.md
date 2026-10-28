@@ -12,21 +12,21 @@ a team in the course story, and is not copied here; the tools take its path as a
 
 | problem | reports | what it is | ticket |
 |---|---:|---|---|
-| `parser` | 374 | the shared parser reads every date month first; all tenants write the day first | [#1](https://github.com/AlejandroCoronadoN/wake-4471/issues/1) |
+| `parser` | 379 | the shared parser reads every date month first; all tenants write the day first | [#1](https://github.com/AlejandroCoronadoN/wake-4471/issues/1) |
 | `hint` | 33 | `booking-v3` prints `MM/DD/YYYY` under the date field; people obey it, the form reads day first | [#2](https://github.com/AlejandroCoronadoN/wake-4471/issues/2) |
 | `one-day-move` | 5 | the day shifts by one, the month does not: a date treated as an instant, crossing midnight | [#3](https://github.com/AlejandroCoronadoN/wake-4471/issues/3) |
 
-374 + 33 + 5 = 412. The export has 427 rows; 15 are duplicate ids from overlapping export pages.
+379 + 33 = 412 by cause; the 5 one-day moves are counted inside `parser` by the desk (as exported) and have a ticket of their own. The export has 427 rows; 15 are duplicate ids from overlapping export pages.
 
 ## How the numbers are made
 
 - `tools/split-4471.mjs` ports the kb's own rule (`src/lib/kb/causes.ts`: place a report by its
-  tenant's locale and booking form, never by intake's browser guess) and then takes out the five
-  reports the desk itself read as a one-day move (`src/lib/data/desk-notes.json`).
+  tenant's locale and booking form, never by intake's browser guess) and keeps the desk's own view
+  of the five one-day moves (`src/lib/data/desk-notes.json`): counted in `parser`, footnoted, here a row.
 - `tools/split-4471.json` is its output: counts per problem by tenant, channel and intake tag,
   and every report id.
-- The kb's current `CauseTable` prints 379 / 33 with a footnote of 5. Here the 5 are a row, not
-  a footnote, so `parser` reads 374. A report belongs to one problem; a ticket to one problem.
+- The kb's current `CauseTable` prints 379 / 33 with a footnote of 5. The counts here are the same,
+  the desk's view as exported; the footnote becomes a row with a ticket of its own.
 
 ```
 node tools/split-4471.mjs <support-kb dir> > tools/split-4471.json

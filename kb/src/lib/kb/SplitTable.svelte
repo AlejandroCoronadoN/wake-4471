@@ -10,7 +10,7 @@
 
   const groups = $derived(splitTicket(reports as Report[], ticket, tenantOf, notes.oneDayMove));
   $effect(() => assertPartition(groups, reports as Report[], ticket));
-  const total = $derived(groups.reduce((n, g) => n + g.reports.length, 0));
+  const total = $derived(groups.filter((g) => !g.countedIn).reduce((n, g) => n + g.reports.length, 0));
   const list = (o: Record<string, number>) =>
     Object.entries(o)
       .sort((a, b) => b[1] - a[1])
@@ -42,7 +42,11 @@
   </tbody>
 </table>
 
+{#each groups.filter((g) => g.countedIn) as g (g.problem)}
+  <p class="note">{g.reports.length} reports read as a <code>{g.problem}</code>: the desk counts them in <code>{g.countedIn}</code>, as exported; they have a ticket of their own.</p>
+{/each}
+
 <style>
   .sum { font-size: 1.1rem; }
-  .tags { color: var(--muted); font-size: 0.85em; }
+  .tags, .note { color: var(--muted); font-size: 0.85em; }
 </style>
