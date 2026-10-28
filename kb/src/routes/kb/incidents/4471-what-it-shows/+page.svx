@@ -1,0 +1,79 @@
+---
+layout: runbook
+title: '#4471 · what it shows: three problems, not one'
+owner: alejandro-coronado
+status: proposed
+reviewed: 2026-10-28
+signature: 'v1.eyJzdWIiOiI1OTk2IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMyMTIyNTcsImV4cCI6MTc5MzI5ODY1N30.m_b-fWvOFgYPOeZeUOQYD-PByo1Dl2ZOuqrMjvct7V0'
+---
+
+<script>
+  import SplitTable from '#lib/kb/SplitTable.svelte';
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+  const filed = {
+    parser: '__ISSUE_PARSER__',
+    hint: '__ISSUE_HINT__',
+    'one-day-move': '__ISSUE_ONEDAY__',
+  };
+</script>
+
+The [#4471 page](/kb/incidents/4471) says "one issue, one fix queued". Its own table says two
+causes. The reports say three problems. This page keeps what the data shows, and gives each
+problem a ticket of its own.
+
+<Callout kind="warn">
+Reading the 412 bodies, not the subjects, is what split the ticket. Decision 0001 merges on
+subject alone, and twelve subject lines covered all three problems.
+</Callout>
+
+## The split
+
+<SplitTable ticket={4471} {filed} />
+
+How the rows are made, in words:
+
+1. One id, one report. The export has 427 rows and 412 ids; the ticket system pages overlap
+   (`uniqueById`, as `causes.ts` already does).
+2. Every report is placed by its **tenant** (locale and booking form), never by what intake
+   guessed from the browser (`causeOf` in `causes.ts`). Intake disagreed with the tenant on 38
+   reports: 23 tagged `hint` are `parser`, 15 tagged `parser` are `hint`.
+3. The five reports the desk itself read as a one-day move (`desk-notes.json`) leave the `parser`
+   row and get their own. `causes.ts` kept them under `parser` as a footnote; a report belongs to
+   one problem, so here it is a row. That is why `parser` reads 374 here and 379 in the table below.
+
+## The three problems
+
+**`parser` · dates parse month first for day-first tenants.** The shared parser reads every date
+as mm/dd. All eleven tenants on file write the day first (`dayFirst` asks the platform, per
+locale), so 07/04 becomes 4 July. Every channel, every tenant, April to October. One code fix
+in the parser.
+
+**`hint` · booking-v3 prints the wrong hint under the date field.** Through `booking-v3` the form
+tells people to type `MM/DD/YYYY`; they do, and the form reads it the tenant's way, day first.
+Only the three tenants on `booking-v3` (alder.physio, copper.studio, pale.harbour), only the
+`form` channel. Fixing the parser does not fix this: the hint is wrong, not the parse.
+
+**`one-day-move` · the day moves by one, the month does not.** Five reports describe a shift of
+one day with the month intact, or a time-zone split: "Invite says Tuesday 12 May. Calendar says
+Monday 11 May", "Client in Lisbon got Tuesday. Client in Toronto got Monday", "The invite arrived
+before I made the booking", "Every booking in June is one day off". Not a parse order problem. A
+date is being treated as an instant and crossing midnight somewhere. Under-reported: the last one
+says "I have stopped reporting these".
+
+## What the desk's table shows today
+
+For comparison, the table the current page builds from the same data:
+
+<CauseTable ticket={4471} />
+
+## What to change on the desk
+
+- Mark #4471 as the `parser` problem only; link the other two tickets from it.
+- Stop closing the ticket on subject matches alone for date problems: the body carries the
+  problem, the subject does not. A new decision record should replace 0001 for this class.
+- Intake's `intakeTag` is a guess from the browser locale. Place reports by tenant at intake,
+  which the tenant directory already allows.
+
+<RenderStamp {signature} />

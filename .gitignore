@@ -1,0 +1,6 @@
+node_modules/
+.DS_Store
+# the desk's export and anything from the course stays out of the repo
+support-kb/
+*.zip
+log*

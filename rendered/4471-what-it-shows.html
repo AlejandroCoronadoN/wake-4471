@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>#4471 · what it shows: three problems, not one · support kb</title>
+<style>
+:root { --bg: #fbfaf7; --fg: #1d1d1b; --muted: #6b6a66; --line: #e3e0d8; --accent: #2f6f5e; --warn: #b4501f; --warn-bg: #fbeee6; --note-bg: #eef5f2; --mono: ui-monospace, 'Cascadia Code', Menlo, monospace; }
+@media (prefers-color-scheme: dark) { :root { --bg: #171716; --fg: #ecebe6; --muted: #9c9a93; --line: #34332f; --accent: #6fbfa6; --warn: #f0905d; --warn-bg: #3a2418; --note-bg: #1d2c27; } }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, sans-serif; }
+.kb table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.92rem; }
+.kb th, .kb td { border-bottom: 1px solid var(--line); padding: 0.35rem 0.5rem; text-align: left; }
+.kb code { font-family: var(--mono); font-size: 0.88em; }
+.kb a { color: var(--accent); }
+.kb { max-width: 760px; margin: 0 auto; padding: 2rem 16px 4rem; }
+.crumb { font: 0.8rem var(--mono); text-decoration: none; color: var(--muted); }
+h1 { margin: 0.25rem 0 0.5rem; line-height: 1.2; }
+.meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; color: var(--muted); font-size: 0.85rem; margin: 0; }
+.status { border: 1px solid var(--line); border-radius: 99px; padding: 0 0.6rem; }
+footer { margin-top: 3rem; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+aside { border-left: 4px solid var(--accent); padding: 0.5rem 1rem; margin: 1rem 0; background: var(--note-bg); }
+aside.warn { border-color: var(--warn); background: var(--warn-bg); }
+.sum { font-size: 1.1rem; } .tags, .note { color: var(--muted); font-size: 0.85em; }
+.wrong td { background: var(--warn-bg); } .wrong td:last-child { color: var(--warn); font-weight: 600; }
+.stamp { margin: 2rem 0 0; font: 0.85rem var(--mono); color: var(--muted); } .stamp b { color: var(--accent); letter-spacing: 0.04em; }
+</style></head>
+<body><div class="kb">
+<header>
+<a class="crumb" href="/kb">support desk · kb</a>
+<h1>#4471 · what it shows: three problems, not one</h1>
+<p class="meta"><span>owner <b>alejandro-coronado</b></span><span class="status proposed">proposed</span><span>reviewed 2026-10-28 · 0 days ago</span></p>
+</header>
+<main>
+
+<p>The <a href="/kb/incidents/4471">#4471 page</a> says "one issue, one fix queued". Its own table says two causes. The reports say three problems. This page keeps what the data shows, and gives each problem a ticket of its own.</p>
+<aside class="warn">Reading the 412 bodies, not the subjects, is what split the ticket. Decision 0001 merges on
+subject alone, and twelve subject lines covered all three problems.</aside>
+<h2>The split</h2>
+<p class="sum"><strong>412</strong> reports merged into #4471 · <strong>3</strong> problems</p>
+<table><thead><tr><th>problem</th><th>reports</th><th>tagged at intake as</th><th>via</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead><tbody>
+<tr><td><code>parser</code></td><td>374</td><td class="tags">parser ×351 · hint ×23</td><td class="tags">app ×202 · email ×147 · form ×25</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td>none yet</td></tr>
+<tr><td><code>hint</code></td><td>33</td><td class="tags">hint ×18 · parser ×15</td><td class="tags">form ×33</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td>none yet</td></tr>
+<tr><td><code>one-day-move</code></td><td>5</td><td class="tags">parser ×5</td><td class="tags">email ×3 · app ×2</td><td>5</td><td>2026-04-02 → 2026-10-04</td><td>none yet</td></tr>
+</tbody></table>
+<p>How the rows are made, in words:</p>
+<ol><li>One id, one report. The export has 427 rows and 412 ids; the ticket system pages overlap (<code>uniqueById</code>, as <code>causes.ts</code> already does).</li><li>Every report is placed by its <strong>tenant</strong> (locale and booking form), never by what intake guessed from the browser (<code>causeOf</code> in <code>causes.ts</code>). Intake disagreed with the tenant on 38 reports: 23 tagged <code>hint</code> are <code>parser</code>, 15 tagged <code>parser</code> are <code>hint</code>.</li><li>The five reports the desk itself read as a one-day move (<code>desk-notes.json</code>) leave the <code>parser</code> row and get their own. <code>causes.ts</code> kept them under <code>parser</code> as a footnote; a report belongs to one problem, so here it is a row. That is why <code>parser</code> reads 374 here and 379 in the table below.</li></ol>
+<h2>The three problems</h2>
+<p><strong><code>parser</code> · dates parse month first for day-first tenants.</strong> The shared parser reads every date as mm/dd. All eleven tenants on file write the day first (<code>dayFirst</code> asks the platform, per locale), so 07/04 becomes 4 July. Every channel, every tenant, April to October. One code fix in the parser.</p>
+<p><strong><code>hint</code> · booking-v3 prints the wrong hint under the date field.</strong> Through <code>booking-v3</code> the form tells people to type <code>MM/DD/YYYY</code>; they do, and the form reads it the tenant's way, day first. Only the three tenants on <code>booking-v3</code> (alder.physio, copper.studio, pale.harbour), only the <code>form</code> channel. Fixing the parser does not fix this: the hint is wrong, not the parse.</p>
+<p><strong><code>one-day-move</code> · the day moves by one, the month does not.</strong> Five reports describe a shift of one day with the month intact, or a time-zone split: "Invite says Tuesday 12 May. Calendar says Monday 11 May", "Client in Lisbon got Tuesday. Client in Toronto got Monday", "The invite arrived before I made the booking", "Every booking in June is one day off". Not a parse order problem. A date is being treated as an instant and crossing midnight somewhere. Under-reported: the last one says "I have stopped reporting these".</p>
+<h2>What the desk's table shows today</h2>
+<p>For comparison, the table the current page builds from the same data:</p>
+<p class="sum"><strong>412</strong> reports merged into #4471 · <strong>2</strong> causes</p>
+<table><thead><tr><th>cause</th><th>reports</th><th>tagged as</th><th>tenants</th><th>seen</th><th></th></tr></thead><tbody>
+<tr><td><code>parser</code></td><td>379</td><td class="tags">parser ×356 · hint ×23</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td>#4471</td></tr>
+<tr class="wrong"><td><code>hint</code></td><td>33</td><td class="tags">hint ×18 · parser ×15</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td>not this ticket — no ticket of its own</td></tr>
+</tbody></table>
+<p class="note">5 reports read as a one-day move; filed under <code>parser</code> by tenant.</p>
+<h2>What to change on the desk</h2>
+<ul><li>Mark #4471 as the <code>parser</code> problem only; link the other two tickets from it.</li><li>Stop closing the ticket on subject matches alone for date problems: the body carries the problem, the subject does not. A new decision record should replace 0001 for this class.</li><li>Intake's <code>intakeTag</code> is a guess from the browser locale. Place reports by tenant at intake, which the tenant directory already allows.</li></ul>
+<p class="stamp">desk ref <b>DR-BHNF-99C9</b></p>
+</main>
+<footer>Pages are written by people. Tables and charts are built from data at render time.</footer>
+</div></body></html>
