@@ -13,9 +13,9 @@ signature: 'v1.eyJzdWIiOiI1OTk2IiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpY
   import Callout from '#lib/kb/Callout.svelte';
   import RenderStamp from '#lib/kb/RenderStamp.svelte';
   const filed = {
-    parser: '__ISSUE_PARSER__',
-    hint: '__ISSUE_HINT__',
-    'one-day-move': '__ISSUE_ONEDAY__',
+    parser: 'https://github.com/AlejandroCoronadoN/wake-4471/issues/1',
+    hint: 'https://github.com/AlejandroCoronadoN/wake-4471/issues/2',
+    'one-day-move': 'https://github.com/AlejandroCoronadoN/wake-4471/issues/3',
   };
 </script>
 

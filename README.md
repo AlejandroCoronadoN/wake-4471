@@ -12,9 +12,9 @@ a team in the course story, and is not copied here; the tools take its path as a
 
 | problem | reports | what it is | ticket |
 |---|---:|---|---|
-| `parser` | 374 | the shared parser reads every date month first; all tenants write the day first | issue #1 |
-| `hint` | 33 | `booking-v3` prints `MM/DD/YYYY` under the date field; people obey it, the form reads day first | issue #2 |
-| `one-day-move` | 5 | the day shifts by one, the month does not: a date treated as an instant, crossing midnight | issue #3 |
+| `parser` | 374 | the shared parser reads every date month first; all tenants write the day first | [#1](https://github.com/AlejandroCoronadoN/wake-4471/issues/1) |
+| `hint` | 33 | `booking-v3` prints `MM/DD/YYYY` under the date field; people obey it, the form reads day first | [#2](https://github.com/AlejandroCoronadoN/wake-4471/issues/2) |
+| `one-day-move` | 5 | the day shifts by one, the month does not: a date treated as an instant, crossing midnight | [#3](https://github.com/AlejandroCoronadoN/wake-4471/issues/3) |
 
 374 + 33 + 5 = 412. The export has 427 rows; 15 are duplicate ids from overlapping export pages.
 
